@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Video Converter</title>
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:20px;
+        }
+        .container {
+            background:rgba(255,255,255,0.95);
+            border-radius:20px; padding:30px;
+            box-shadow:0 20px 40px rgba(0,0,0,0.1);
+            max-width:800px; width:100%; backdrop-filter:blur(10px);
+        }
+        h1 {
+            text-align:center; color:#333; margin-bottom:30px; font-size:2.5em;
+            background:linear-gradient(45deg,#667eea,#764ba2);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+        }
+        textarea {
+            width:100%; height:120px; padding:15px;
+            border:2px solid #e1e5e9; border-radius:12px; font-size:16px;
+        }
+        .controls { display:flex; gap:15px; flex-wrap:wrap; margin-top:15px; }
+        .btn {
+            background:linear-gradient(45deg,#667eea,#764ba2);
+            color:white; border:none; padding:12px 30px; border-radius:25px;
+            font-size:16px; cursor:pointer;
+        }
+        canvas { width:100%; height:400px; display:block; }
+    </style>
+</head>
+<body>
+<div class="container">
+<h1>🎬 Text to Video</h1>
+
+<label>Enter your text:</label>
+<textarea id="textInput" placeholder="Type your message here..."></textarea>
+
+<div class="controls">
+<select id="voiceSelect">
+<option value="default">Voice Style</option>
+<option value="male">Male Voice</option>
+<option value="female">Female Voice</option>
+<option value="robotic">Robotic</option>
+</select>
+
+<input type="range" id="speedControl" min="0.5" max="2" step="0.1" value="1">
+<button class="btn" id="convertBtn">Convert to Video</button>
+</div>
+
+<div id="videoPreview">
+<canvas id="videoCanvas"></canvas>
+</div>
+
+<button class="btn" id="downloadBtn">Download Video</button>
+
+</div>
+
+<script>
+class TextToVideo {
+constructor(){
+this.canvas=document.getElementById('videoCanvas');
+this.ctx=this.canvas.getContext('2d');
+this.canvas.width=1280;
+this.canvas.height=720;
+
+document.getElementById('convertBtn').addEventListener('click',()=>this.convertText());
+document.getElementById('downloadBtn').addEventListener('click',()=>this.downloadVideo());
+}
+
+convertText(){
+const text=document.getElementById('textInput').value;
+if(!text){ alert("Enter text"); return; }
+
+const utterance=new SpeechSynthesisUtterance(text);
+speechSynthesis.speak(utterance);
+
+let time=0;
+const animate=()=>{
+this.drawFrame(text,time);
+time+=0.05;
+requestAnimationFrame(animate);
+}
+animate();
+}
+
+drawFrame(text,time){
+const gradient=this.ctx.createLinearGradient(0,0,this.canvas.width,this.canvas.height);
+gradient.addColorStop(0,'#667eea');
+gradient.addColorStop(1,'#764ba2');
+this.ctx.fillStyle=gradient;
+this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
+
+this.ctx.fillStyle="white";
+this.ctx.font="bold 80px Segoe UI";
+this.ctx.textAlign="center";
+this.ctx.fillText(text,this.canvas.width/2,this.canvas.height/2);
+}
+
+downloadVideo(){
+alert("Video download feature depends on browser MediaRecorder support.");
+}
+}
+
+window.onload=()=>{ new TextToVideo(); }
+</script>
+</body>
+</html>
